@@ -1,4 +1,4 @@
-package com.SelfParkingSystems.MainServer.security;
+package com.SelfParkingSystems.MainServer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
