@@ -6,14 +6,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/account/acc={acc_id}")
 @RequiredArgsConstructor
 public class AccountController {
 
 
     @GetMapping("/test")
-    public String test(){
-        return "test ok";
+    public String test(@PathVariable String acc_id){
+
+        return "test ok\nacc_id:"+acc_id;
     }
 
 }
