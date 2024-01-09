@@ -36,7 +36,7 @@ public class PaymentRecipe {
     @Column(
             name="name",
             nullable = false,
-            length = 26
+            length = 20
     )
     private  String name;
 

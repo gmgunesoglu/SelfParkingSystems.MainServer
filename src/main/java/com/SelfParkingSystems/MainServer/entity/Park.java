@@ -50,7 +50,7 @@ public class Park {
     @Column(
             name="base_url",
             nullable = false,
-            length = 100,
+            length = 60,
             unique = true
     )
     private  String baseUrl;
