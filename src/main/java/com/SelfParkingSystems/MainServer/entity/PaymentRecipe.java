@@ -15,7 +15,8 @@ public class PaymentRecipe {
     @SequenceGenerator(
             name = "payment_recipe_seq",
             sequenceName = "payment_recipe_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

@@ -15,7 +15,8 @@ public class Location {
     @SequenceGenerator(
             name = "location_seq",
             sequenceName = "location_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

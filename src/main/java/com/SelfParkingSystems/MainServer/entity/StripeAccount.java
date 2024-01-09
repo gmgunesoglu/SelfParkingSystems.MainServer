@@ -14,7 +14,8 @@ public class StripeAccount{
     @SequenceGenerator(
             name = "stripe_account_seq",
             sequenceName = "stripe_account_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

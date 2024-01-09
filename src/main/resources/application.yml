@@ -6,10 +6,14 @@ spring:
     password: 123qweqwe
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     show-sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  SECRET_KEY: e34bc93bce34083f4dc6900e986019e7f08cf994c01046348dd69f8f05f00cb9
+  TOKEN_DURATION: 21600000  #6 saat

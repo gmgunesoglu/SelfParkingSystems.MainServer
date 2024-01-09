@@ -14,7 +14,8 @@ public class Person {
     @SequenceGenerator(
             name = "person_seq",
             sequenceName = "person_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
@@ -79,9 +80,9 @@ public class Person {
     private String email;
 
     @Column(
-            name = "block_time"
+            name = "bloc_date"
     )
-    private Date blockTime;
+    private Date blockDate;
 
     @Column(
             name = "enable",
@@ -100,4 +101,12 @@ public class Person {
     @OneToMany(targetEntity = Reservation.class, cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",referencedColumnName = "id")
     private List<Reservation> reservations;
+
+    @OneToMany(targetEntity = StaffOfOwner.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="owner_id",referencedColumnName = "id")
+    private List<StaffOfOwner> staffsOfOwner;
+
+    @OneToOne(targetEntity = StripeAccount.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="id",referencedColumnName = "owner_id")
+    private StripeAccount stripeAccount;
 }

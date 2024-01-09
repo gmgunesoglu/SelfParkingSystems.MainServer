@@ -16,7 +16,8 @@ public class Parking {
     @SequenceGenerator(
             name = "parking_seq",
             sequenceName = "parking_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

@@ -15,7 +15,8 @@ public class Slot {
     @SequenceGenerator(
             name = "slot_seq",
             sequenceName = "slot_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

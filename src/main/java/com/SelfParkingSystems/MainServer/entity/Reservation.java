@@ -13,7 +13,8 @@ public class Reservation {
     @SequenceGenerator(
             name = "reservation_seq",
             sequenceName = "reservation_seq",
-            allocationSize = 1
+            allocationSize = 1,
+            initialValue = 1000
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
