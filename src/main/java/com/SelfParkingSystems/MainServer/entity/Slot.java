@@ -1,5 +1,6 @@
 package com.SelfParkingSystems.MainServer.entity;
 
+import com.SelfParkingSystems.MainServer.dto.SlotState;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -41,11 +42,11 @@ public class Slot {
     )
     private  String name;
 
-    @Column(
-            name = "payment_recipe_id",
-            nullable = false
-    )
-    private Long paymentRecipeId;
+//    @Column(
+//            name = "payment_recipe_id",
+//            nullable = false
+//    )
+//    private Long paymentRecipeId;
 
     @Column(
             name="state",
@@ -69,4 +70,7 @@ public class Slot {
     @JoinColumn(name="slot_id",referencedColumnName = "id")
     private List<Reservation> reservations;
 
+    @OneToOne(targetEntity = PaymentRecipe.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="payment_recipe_id",referencedColumnName = "id")
+    private PaymentRecipe paymentRecipe;
 }

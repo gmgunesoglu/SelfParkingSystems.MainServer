@@ -19,12 +19,12 @@ public class ParkController {
 
     private final ParkService parkService;
 
-    @GetMapping
+    @GetMapping("/show")
     public List<ParkDto> getAll(HttpServletRequest request){
         return parkService.getAll(request);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/show/{id}")
     public ParkDetailDto get(@PathVariable Long id, HttpServletRequest request){
         return parkService.get(id, request);
     }

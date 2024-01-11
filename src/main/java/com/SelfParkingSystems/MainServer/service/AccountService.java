@@ -1,6 +1,7 @@
 package com.SelfParkingSystems.MainServer.service;
 
 import com.SelfParkingSystems.MainServer.dto.*;
+import com.SelfParkingSystems.MainServer.entity.Person;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AccountService {
@@ -27,4 +28,6 @@ public interface AccountService {
     String updateStripe(StripeAccountUpdateDto stripeAccountUpdateDto, HttpServletRequest request);
 
     String remove(LoginDto loginDto, HttpServletRequest request);
+
+    Person getPerson(HttpServletRequest request);
 }

@@ -56,11 +56,11 @@ public class Park {
     )
     private  String baseUrl;
 
-    @Column(
-            name = "location_id",
-            nullable = false
-    )
-    private Long locationId;
+//    @Column(
+//            name = "location_id",
+//            nullable = false
+//    )
+//    private Long locationId;
 
     @Column(
             name="address",
@@ -78,4 +78,8 @@ public class Park {
     @OneToMany(targetEntity = Slot.class, cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name="park_id",referencedColumnName = "id")
     private List<Slot> slots;
+
+    @OneToOne(targetEntity = Location.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="location_id",referencedColumnName = "id")
+    private Location location;
 }

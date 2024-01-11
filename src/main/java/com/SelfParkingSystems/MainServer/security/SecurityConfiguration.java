@@ -33,10 +33,14 @@ public class SecurityConfiguration {
                         "/account/**",
                         "/test/user"
                 ).hasAnyAuthority("USER","STAFF","OWNER","ADMIN")
-                .requestMatchers("/test/staff").hasAnyAuthority("STAFF","OWNER","ADMIN")
+                .requestMatchers(
+                        "/test/staff",
+                        "/manage/parks/show/**"
+                ).hasAnyAuthority("STAFF","OWNER","ADMIN")
                 .requestMatchers(
                         "/test/owner",
-                        "/account/rise/staff"
+                        "/account/rise/staff",
+                        "manage/parks/**"
                 ).hasAnyAuthority("ADMIN","OWNER")
                 .requestMatchers(
                         "/test/admin",

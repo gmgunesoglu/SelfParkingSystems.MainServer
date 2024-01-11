@@ -11,13 +11,10 @@ import com.SelfParkingSystems.MainServer.security.SessionControl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -245,6 +242,12 @@ public class AccountServiceImpl implements AccountService{
         return "Hesabınız silinmiştir.";
     }
 
+    @Override
+    public Person getPerson(HttpServletRequest request){
+        String userName = jwtService.getUsername(request);
+        return personRepository.findByUserName(userName);
+    }
+
     private AccountDto personToAccountDto(Person person){
         AccountDto dto = new AccountDto();
         dto.setId(person.getId());
@@ -255,10 +258,5 @@ public class AccountServiceImpl implements AccountService{
         dto.setPhoneNumber(person.getPhoneNumber());
         dto.setEmail(person.getEmail());
         return dto;
-    }
-
-    private Person getPerson(HttpServletRequest request){
-        String userName = jwtService.getUsername(request);
-        return personRepository.findByUserName(userName);
     }
 }
