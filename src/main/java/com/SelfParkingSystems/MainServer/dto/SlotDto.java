@@ -9,4 +9,15 @@ public class SlotDto {
     private String slotName;
     private String paymentRecipeName;
     private SlotState state;
+
+    public SlotDto() {
+    }
+
+    public SlotDto(Long id, String parkName, String slotName, String paymentRecipeName, SlotState state) {
+        this.id = id;
+        this.parkName = parkName;
+        this.slotName = slotName;
+        this.paymentRecipeName = paymentRecipeName;
+        this.state = state;
+    }
 }
