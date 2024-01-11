@@ -11,4 +11,5 @@ public class ParkUpdateDto {
     private String town;
     private String district;
     private String address;
+    private int reservationDuration;
 }

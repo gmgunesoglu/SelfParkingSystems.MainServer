@@ -21,16 +21,16 @@ public class LocationServiceImpl implements LocationService{
 
     @Override
     public List<String> getTowns(String city) {
-        return locationRepository.getTowns(city);
+        return locationRepository.getTowns(city.toUpperCase());
     }
 
     @Override
     public List<String> getDistricts(String city, String town) {
-        return locationRepository.getDistricts(city, town);
+        return locationRepository.getDistricts(city.toUpperCase(), town.toUpperCase());
     }
 
     @Override
     public Long getLocationId(String city, String town, String district) {
-        return locationRepository.getLocationId(city, town, district);
+        return locationRepository.getLocationId(city.toUpperCase(), town.toUpperCase(), district.toUpperCase());
     }
 }

@@ -56,18 +56,18 @@ public class Park {
     )
     private  String baseUrl;
 
-//    @Column(
-//            name = "location_id",
-//            nullable = false
-//    )
-//    private Long locationId;
-
     @Column(
             name="address",
             nullable = false,
             length = 300
     )
     private  String address;
+
+    @Column(
+            name="reservation_duration",
+            nullable = false
+    )
+    private int reservationDuration;
 
     @Column(
             name = "enable",

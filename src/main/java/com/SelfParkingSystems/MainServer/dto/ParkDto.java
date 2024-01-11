@@ -12,11 +12,12 @@ public class ParkDto {
     private String town;
     private String district;
     private String address;
+    private int reservationDuration;
 
     public ParkDto() {
     }
 
-    public ParkDto(Long id, String name, String secretKey, String baseUrl, String city, String town, String district, String address) {
+    public ParkDto(Long id, String name, String secretKey, String baseUrl, String city, String town, String district, String address, int reservationDuration) {
         this.id = id;
         this.name = name;
         this.secretKey = secretKey;
@@ -25,5 +26,6 @@ public class ParkDto {
         this.town = town;
         this.district = district;
         this.address = address;
+        this.reservationDuration = reservationDuration;
     }
 }

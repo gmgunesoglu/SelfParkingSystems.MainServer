@@ -19,4 +19,6 @@ public class ParkRegisterDto {
     private String district;
     @Size(min=20, max=300, message="Adres en az 3 en fazla 300 karakter olmalıdır!")
     private String address;
+    @Size(min = 30, max = 120, message = "Rezervasyon süresi en az 30, en fazla 120 dakikadır!")
+    private int reservationDuration;
 }

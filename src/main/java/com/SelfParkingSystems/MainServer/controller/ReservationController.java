@@ -29,6 +29,6 @@ public class ReservationController {
 
     @PostMapping
     public ReservationDto add(@RequestBody ReservationRegisterDto reservationRegisterDto, HttpServletRequest request){
-        return reservationService.add(reservationService, request);
+        return reservationService.add(reservationRegisterDto, request);
     }
 }
