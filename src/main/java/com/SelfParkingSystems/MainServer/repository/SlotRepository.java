@@ -2,10 +2,12 @@ package com.SelfParkingSystems.MainServer.repository;
 
 import com.SelfParkingSystems.MainServer.dto.*;
 import com.SelfParkingSystems.MainServer.entity.Slot;
+import com.SelfParkingSystems.MainServer.service.SlotService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SlotRepository extends JpaRepository<Slot, Long> {
 
@@ -14,7 +16,7 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
             "(s.id, p.name, s.name, s.paymentRecipe.name, s.state) FROM Slot s " +
             "JOIN Park p ON s.parkId = p.id " +
             "JOIN Person per ON p.ownerId = per.id " +
-            "WHERE per.id = :ownerId")
+            "WHERE per.id = :ownerId  AND p.enable = true")
     List<SlotDto> getSlotDtoListByOwnerId(Long ownerId);
 
     @Query("SELECT new com.SelfParkingSystems.MainServer.dto.SlotDetailDto" +
@@ -76,4 +78,6 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
             "(s.id, s.name, s.state, s.paymentRecipe.hours2, s.paymentRecipe.hours4, s.paymentRecipe.hours6, s.paymentRecipe.hours10, s.paymentRecipe.hours24) " +
             "FROM Slot s WHERE s.enable = true AND s.id = :slotId")
     SlotListDetailDto getSlotListDetailDtoById(Long slotId);
+
+    Optional<Slot> findByIdAndEnable(Long id, boolean enable);
 }

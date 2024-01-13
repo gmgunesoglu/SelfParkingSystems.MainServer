@@ -33,4 +33,13 @@ public class LocationServiceImpl implements LocationService{
     public Long getLocationId(String city, String town, String district) {
         return locationRepository.getLocationId(city.toUpperCase(), town.toUpperCase(), district.toUpperCase());
     }
+
+    @Override
+    public Location saveLocationIfNotExists(Location location) {
+        Location theLocation = locationRepository.findByCityAndTownAndDistrict(location.getCity(), location.getTown(), location.getDistrict()).get();
+        if(theLocation == null){
+            return locationRepository.save(location);
+        }
+        return theLocation;
+    }
 }

@@ -80,7 +80,7 @@ public class Person {
     private String email;
 
     @Column(
-            name = "bloc_date"
+            name = "block_date"
     )
     private Date blockDate;
 

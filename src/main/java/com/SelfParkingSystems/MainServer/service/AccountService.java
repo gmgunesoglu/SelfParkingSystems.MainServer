@@ -36,4 +36,6 @@ public interface AccountService {
     Person getPerson(HttpServletRequest request);
 
     Person getOwner(HttpServletRequest request);
+
+    Long getPersonId(HttpServletRequest request);
 }

@@ -25,7 +25,7 @@ public class StaffOfOwner {
     )
     private Long staffId;
 
-    @OneToOne(targetEntity = Person.class, cascade = {}, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Person.class, cascade = {}, fetch = FetchType.LAZY)
     @JoinColumn(name="owner_id",referencedColumnName = "id", nullable = false)
     private Person owner;
 }

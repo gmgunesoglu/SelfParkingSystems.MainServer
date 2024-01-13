@@ -79,7 +79,7 @@ public class Park {
     @JoinColumn(name="park_id",referencedColumnName = "id")
     private List<Slot> slots;
 
-    @OneToOne(targetEntity = Location.class, cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(name="location_id",referencedColumnName = "id")
+    @ManyToOne(targetEntity = Location.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="location_id",referencedColumnName = "id", nullable = false)
     private Location location;
 }

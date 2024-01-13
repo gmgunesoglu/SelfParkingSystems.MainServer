@@ -54,6 +54,6 @@ public class Payment {
     private Date date;
 
     @OneToOne(targetEntity = Parking.class, cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(name="parking_id",referencedColumnName = "id")
+    @JoinColumn(name="parking_id", nullable = false, referencedColumnName = "id")
     private Parking parking;
 }

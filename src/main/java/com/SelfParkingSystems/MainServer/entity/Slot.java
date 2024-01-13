@@ -42,12 +42,6 @@ public class Slot {
     )
     private  String name;
 
-//    @Column(
-//            name = "payment_recipe_id",
-//            nullable = false
-//    )
-//    private Long paymentRecipeId;
-
     @Column(
             name="state",
             nullable = false,
@@ -70,7 +64,7 @@ public class Slot {
     @JoinColumn(name="slot_id",referencedColumnName = "id")
     private List<Reservation> reservations;
 
-    @OneToOne(targetEntity = PaymentRecipe.class, cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(name="payment_recipe_id",referencedColumnName = "id")
+    @ManyToOne(targetEntity = PaymentRecipe.class, cascade = {}, fetch = FetchType.LAZY)
+    @JoinColumn(name="payment_recipe_id", referencedColumnName = "id", nullable = false)
     private PaymentRecipe paymentRecipe;
 }

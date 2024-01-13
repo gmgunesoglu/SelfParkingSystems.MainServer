@@ -96,7 +96,7 @@ public class ReservationServiceImpl implements ReservationService{
 
     private void checkReservations(){
         for (ArrayList<ReservationKeeperDto> list : reservationsQueues.values()) {
-            if(list.get(0).getFinishDate().before(new Date(System.currentTimeMillis()))){
+            if(!list.isEmpty() && list.get(0).getFinishDate().before(new Date(System.currentTimeMillis()))){
                 clearList(list);
             }
         }

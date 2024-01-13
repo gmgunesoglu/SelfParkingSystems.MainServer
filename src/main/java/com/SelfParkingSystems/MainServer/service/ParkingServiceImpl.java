@@ -16,16 +16,12 @@ import com.stripe.model.Charge;
 import com.stripe.model.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
 import java.util.*;
 
-@Service
+@Service    
 @Slf4j
 @RequiredArgsConstructor
 public class ParkingServiceImpl implements ParkingService{

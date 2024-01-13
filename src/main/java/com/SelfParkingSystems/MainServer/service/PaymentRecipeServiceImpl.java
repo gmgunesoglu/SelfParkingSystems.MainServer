@@ -1,7 +1,6 @@
 package com.SelfParkingSystems.MainServer.service;
 
 import com.SelfParkingSystems.MainServer.dto.*;
-import com.SelfParkingSystems.MainServer.entity.Authority;
 import com.SelfParkingSystems.MainServer.entity.PaymentRecipe;
 import com.SelfParkingSystems.MainServer.entity.Person;
 import com.SelfParkingSystems.MainServer.entity.Slot;
@@ -19,22 +18,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentRecipeServiceImpl implements PaymentRecipeService{
 
-
     private final PaymentRecipeRepository paymentRecipeRepository;
     private final SlotRepository slotRepository;
     private final AccountService accountService;
-    private final StaffOfOwnerService staffOfOwnerService;
 
 
     @Override
     public List<PaymentRecipeDto> getAll(HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         return paymentRecipeRepository.getPaymentRecipeDtoList(owner.getId());
     }
 
     @Override
     public PaymentRecipeDetailDto get(Long id, HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         PaymentRecipeDetailDto dto = paymentRecipeRepository.getPaymentRecipeDetailDto(owner.getId(), id);
         dto.setSlots(slotRepository.getSlotDtoListByOwnerIdAndPaymentRecipeId(owner.getId(), id));
         return dto;
@@ -42,7 +39,7 @@ public class PaymentRecipeServiceImpl implements PaymentRecipeService{
 
     @Override
     public PaymentRecipeDto add(PaymentRecipeRegisterDto paymentRecipeRegisterDto, HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         PaymentRecipe paymentRecipe = new PaymentRecipe();
         paymentRecipe.setOwnerId(owner.getId());
         paymentRecipe.setName(paymentRecipeRegisterDto.getName());
@@ -66,7 +63,7 @@ public class PaymentRecipeServiceImpl implements PaymentRecipeService{
 
     @Override
     public PaymentRecipeDto update(PaymentRecipeUpdateDto paymentRecipeUpdateDto, Long id, HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         PaymentRecipe paymentRecipe = paymentRecipeRepository.getByIdAndOwnerIdAndEnable(id, owner.getId(), true);
         if(paymentRecipe == null){
             throw new GlobalRuntimeException(paymentRecipeUpdateDto.getName() + " isminde ödeme tarifesi bulunamadı", HttpStatus.BAD_REQUEST);
@@ -102,7 +99,7 @@ public class PaymentRecipeServiceImpl implements PaymentRecipeService{
 
     @Override
     public String remove(Long id, HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         PaymentRecipe paymentRecipe = paymentRecipeRepository.getByIdAndOwnerIdAndEnable(id, owner.getId(), true);
         if(paymentRecipe == null){
             throw new GlobalRuntimeException("Ödeme tarifesi bulunamadı!", HttpStatus.BAD_REQUEST);
@@ -116,13 +113,5 @@ public class PaymentRecipeServiceImpl implements PaymentRecipeService{
         paymentRecipe.setEnable(false);
         paymentRecipeRepository.save(paymentRecipe);
         return "Ödeme tarifesi silindi.";
-    }
-
-    private Person getOwner(HttpServletRequest request){
-        Person person = accountService.getPerson(request);
-        if(person.getAuthority() == Authority.STAFF){
-            person = staffOfOwnerService.getOwner(person);
-        }
-        return person;
     }
 }

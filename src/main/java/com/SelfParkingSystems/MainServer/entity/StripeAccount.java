@@ -44,7 +44,7 @@ public class StripeAccount{
     private String secretKey;
 
     @OneToOne(targetEntity = Person.class, cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(name="owner_id",referencedColumnName = "id")
+    @JoinColumn(name="owner_id", nullable = false, referencedColumnName = "id")
     private Person owner;
 }
 

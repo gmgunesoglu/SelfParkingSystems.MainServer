@@ -22,18 +22,17 @@ public class SlotServiceImpl implements SlotService{
     private final ParkRepository parkRepository;
     private final PaymentRecipeRepository paymentRecipeRepository;
     private final AccountService accountService;
-    private final StaffOfOwnerService staffOfOwnerService;
 
     @Override
     public List<SlotDto> getAll(HttpServletRequest request) {
-        Person person = getOwner(request);
-        return slotRepository.getSlotDtoListByOwnerId(person.getId());
+        Person owner = accountService.getOwner(request);
+        return slotRepository.getSlotDtoListByOwnerId(owner.getId());
     }
 
     @Override
     public SlotDetailDto get(Long id, HttpServletRequest request) {
-        Person person = getOwner(request);
-        SlotDetailDto dto = slotRepository.getSlotDetailDtoById(id, person.getId());
+        Person owner = accountService.getOwner(request);
+        SlotDetailDto dto = slotRepository.getSlotDetailDtoById(id, owner.getId());
         if(dto == null){
             throw new GlobalRuntimeException("Slot bulunamadı!", HttpStatus.BAD_REQUEST);
         }
@@ -46,14 +45,17 @@ public class SlotServiceImpl implements SlotService{
     @Override
     public List<SlotDto> add(SlotRegisterDto slotRegisterDto, HttpServletRequest request) {
         List<Slot> slots = new ArrayList<>();
-        Person person = getOwner(request);
+        Person person = accountService.getOwner(request);
         Park park = parkRepository.findByOwnerIdAndName(person.getId(), slotRegisterDto.getParkName());
         if(park == null){
-            throw new GlobalRuntimeException("Size ait "+slotRegisterDto.getParkName()+" isminde bir park bulunamadı!",HttpStatus.BAD_REQUEST);
+            throw new GlobalRuntimeException("Size ait "+slotRegisterDto.getParkName()+" isminde bir park bulunamadı!", HttpStatus.BAD_REQUEST);
         }
         PaymentRecipe paymentRecipe = paymentRecipeRepository.findByOwnerIdAndName(person.getId(), slotRegisterDto.getPaymentRecipeName());
         if(paymentRecipe == null){
-            throw new GlobalRuntimeException("Size ait "+slotRegisterDto.getPaymentRecipeName()+" isminde bir ödeme tarifesi!",HttpStatus.BAD_REQUEST);
+            throw new GlobalRuntimeException("Size ait "+slotRegisterDto.getPaymentRecipeName()+" isminde bir ödeme tarifesi bulunamadı!", HttpStatus.BAD_REQUEST);
+        }
+        if(slotRegisterDto.getSlotNames() == null || slotRegisterDto.getSlotNames().isEmpty()){
+            throw new GlobalRuntimeException("Otopark alanları için isim listesi bulunamadı!", HttpStatus.BAD_REQUEST);
         }
         for(String slotName : slotRegisterDto.getSlotNames()){
             if(slotName.length() < 3 ||slotName.length() > 8){
@@ -77,12 +79,10 @@ public class SlotServiceImpl implements SlotService{
 
     @Override
     public SlotDto update(SlotUpdateDto slotUpdateDto, Long id, HttpServletRequest request) {
-        Slot slot = slotRepository.findById(id).get();
-        if(slot == null){
-            throw new GlobalRuntimeException("Park alanı bulunamadı!", HttpStatus.BAD_REQUEST);
-        }
-        Person person = getOwner(request);
-        if(person.getId() != slotRepository.getOwnerIdById(id)){
+        Slot slot = slotRepository.findByIdAndEnable(id, true)
+                .orElseThrow(() -> new GlobalRuntimeException("Park alanı bulunamadı!", HttpStatus.BAD_REQUEST));
+        Person owner = accountService.getOwner(request);
+        if(owner.getId() != slotRepository.getOwnerIdById(id)){
             throw new GlobalRuntimeException("Bu park alanı için yetkiniz bulunmamaktadır!", HttpStatus.BAD_REQUEST);
         }
         if(slot.getState()!=SlotState.FREE){
@@ -96,7 +96,7 @@ public class SlotServiceImpl implements SlotService{
             if(parkName.length()<8 || parkName.length()>40){
                 throw new GlobalRuntimeException("Otopar adı en az 8 en fazla 40 karakter olmalıdır!", HttpStatus.BAD_REQUEST);
             }
-            Park park = parkRepository.findByOwnerIdAndName(person.getId(), parkName);
+            Park park = parkRepository.findByOwnerIdAndName(owner.getId(), parkName);
             if(park == null){
                 throw new GlobalRuntimeException(parkName+" isminde bir otoparkınız bulunmamaktadır!", HttpStatus.BAD_REQUEST);
             }
@@ -114,7 +114,7 @@ public class SlotServiceImpl implements SlotService{
             if(paymentRecipeName.length() < 5 || paymentRecipeName.length() > 20){
                 throw new GlobalRuntimeException("Ödeme tarifesi adı en az 5 en fazla 20 karakter olmalıdır!", HttpStatus.BAD_REQUEST);
             }
-            PaymentRecipe paymentRecipe = paymentRecipeRepository.findByOwnerIdAndName(person.getId(), paymentRecipeName);
+            PaymentRecipe paymentRecipe = paymentRecipeRepository.findByOwnerIdAndName(owner.getId(), paymentRecipeName);
             if(paymentRecipe == null){
                 throw new GlobalRuntimeException(paymentRecipeName+" isminde bir ödeme tarifeniz bulunmamaktadır!", HttpStatus.BAD_REQUEST);
             }
@@ -126,12 +126,10 @@ public class SlotServiceImpl implements SlotService{
 
     @Override
     public String remove(Long id, HttpServletRequest request) {
-        Slot slot = slotRepository.findById(id).get();
-        if(slot == null){
-            throw new GlobalRuntimeException("Park alanı bulunamadı!", HttpStatus.BAD_REQUEST);
-        }
-        Person person = getOwner(request);
-        if(person.getId() != slotRepository.getOwnerIdById(id)){
+        Slot slot = slotRepository.findByIdAndEnable(id, true)
+                .orElseThrow(() -> new GlobalRuntimeException("Park alanı bulunamadı!", HttpStatus.BAD_REQUEST));
+        Person owner = accountService.getOwner(request);
+        if(owner.getId() != slotRepository.getOwnerIdById(id)){
             throw new GlobalRuntimeException("Bu park alanı için yetkiniz bulunmamaktadır!", HttpStatus.BAD_REQUEST);
         }
         if(slot.getState()!=SlotState.FREE){
@@ -141,14 +139,4 @@ public class SlotServiceImpl implements SlotService{
         slotRepository.save(slot);
         return "Otopark alanı silindi.";
     }
-
-    private Person getOwner(HttpServletRequest request){
-        Person person = accountService.getPerson(request);
-        if(person.getAuthority() == Authority.STAFF){
-            person = staffOfOwnerService.getOwner(person);
-        }
-        return person;
-    }
-
-
 }

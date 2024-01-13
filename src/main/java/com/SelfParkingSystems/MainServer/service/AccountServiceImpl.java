@@ -279,6 +279,11 @@ public class AccountServiceImpl implements AccountService{
         return owner;
     }
 
+    @Override
+    public Long getPersonId(HttpServletRequest request){
+        return jwtService.getId(request);
+    }
+
     private AccountDto personToAccountDto(Person person){
         AccountDto dto = new AccountDto();
         dto.setId(person.getId());

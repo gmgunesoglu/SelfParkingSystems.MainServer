@@ -6,11 +6,11 @@ import com.SelfParkingSystems.MainServer.exceptionhandling.GlobalRuntimeExceptio
 import com.SelfParkingSystems.MainServer.repository.ParkRepository;
 import com.SelfParkingSystems.MainServer.repository.SlotRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,18 +20,19 @@ public class ParkServiceImpl implements ParkService{
     private final AccountService accountService;
     private final ParkRepository parkRepository;
     private final SlotRepository slotRepository;
-    private final StaffOfOwnerService staffOfOwnerService;
+
+    private final LocationService locationService;
 
 
     @Override
     public List<ParkDto> getAll(HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         return parkRepository.getParkDtoListByOwnerId(owner.getId());
     }
 
     @Override
     public ParkDetailDto get(Long id, HttpServletRequest request) {
-        Person owner = getOwner(request);
+        Person owner = accountService.getOwner(request);
         ParkDetailDto dto = parkRepository.getParkDetailDtoByIdAndOwnerId(id, owner.getId());
         if(dto == null){
             throw new GlobalRuntimeException("Park bulunamadı!", HttpStatus.BAD_REQUEST);
@@ -45,24 +46,30 @@ public class ParkServiceImpl implements ParkService{
         if(parkRegisterDto.getReservationDuration() % 5 != 0){
             throw new GlobalRuntimeException("Maksimum rezervasyon süresi 5 in katları şekilde olmalıdır!", HttpStatus.BAD_REQUEST);
         }
-        Park park = new Park();
         Location location = new Location();
         location.setCity(parkRegisterDto.getCity().toUpperCase());
         location.setTown(parkRegisterDto.getTown().toUpperCase());
         location.setDistrict(parkRegisterDto.getDistrict().toUpperCase());
-        park.setLocation(location);
+
+        Park park = new Park();
+        park.setOwnerId(accountService.getPersonId(request));
         park.setName(parkRegisterDto.getName());
         park.setSecretKey(parkRegisterDto.getSecretKey());
         park.setBaseUrl(parkRegisterDto.getBaseUrl());
+        park.setLocation(locationService.saveLocationIfNotExists(location));
         park.setAddress(parkRegisterDto.getAddress());
         park.setReservationDuration(parkRegisterDto.getReservationDuration());
-        park = parkRepository.save(park);
+        try{
+            park = parkRepository.save(park);
+        }catch (ConstraintViolationException e){
+            throw new GlobalRuntimeException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
         return parkToParkDto(park);
     }
 
     @Override
     public ParkDto update(ParkUpdateDto parkUpdateDto, Long id, HttpServletRequest request) {
-        Park park = parkRepository.findById(id).get();
+        Park park = parkRepository.findByOwnerIdAndEnable(id, true).get();
         if(park == null){
             throw new GlobalRuntimeException("Park bulunamadı!", HttpStatus.BAD_REQUEST);
         }
@@ -135,21 +142,18 @@ public class ParkServiceImpl implements ParkService{
 
     @Override
     public String remove(Long id, HttpServletRequest request) {
-        Park park = parkRepository.findById(id).get();
-        if(park == null){
-            throw new GlobalRuntimeException("Park bulunamadı!", HttpStatus.BAD_REQUEST);
-        }
+        Park park = parkRepository.findByOwnerIdAndEnable(id, true)
+                .orElseThrow(() -> new GlobalRuntimeException("Park bulunamadı!", HttpStatus.BAD_REQUEST));
         Person owner = accountService.getPerson(request);
-        if(park.getOwnerId() != owner.getId()){
+        if(!park.getOwnerId().equals(owner.getId())){
             throw new GlobalRuntimeException("Bu park için yetkniniz bulunmamaktadır!",HttpStatus.BAD_REQUEST);
         }
         for(Slot slot : park.getSlots()){
-            if(slot.getState()!=SlotState.FREE){
+            if(slot.getState() != SlotState.FREE){
                 throw new GlobalRuntimeException("Bu otoparka ait tüm park alanlarınız boş olmalıdır!", HttpStatus.BAD_REQUEST);
             }
             slot.setEnable(false);
         }
-
         park.setEnable(false);
         parkRepository.save(park);
         return "Otopark silindi.";
@@ -167,36 +171,4 @@ public class ParkServiceImpl implements ParkService{
         dto.setAddress(park.getAddress());
         return dto;
     }
-
-    private ParkDetailDto getParkDetailDto(Park park) {
-        ParkDetailDto dto = new ParkDetailDto();
-        dto.setId(park.getId());
-        dto.setName(park.getName());
-        dto.setSecretKey(park.getSecretKey());
-        dto.setBaseUrl(park.getBaseUrl());
-        dto.setCity(park.getLocation().getCity());
-        dto.setTown(park.getLocation().getTown());
-        dto.setDistrict(park.getLocation().getDistrict());
-        dto.setAddress(park.getAddress());
-        dto.setSlots(new ArrayList<>());
-        for(Slot slot : park.getSlots()){
-            SlotDto slotDto = new SlotDto();
-            slotDto.setId(slot.getId());
-            slotDto.setParkName(park.getName());
-            slotDto.setSlotName(slot.getName());
-            slotDto.setPaymentRecipeName(slot.getPaymentRecipe().getName());
-            slotDto.setState(slot.getState());
-            dto.getSlots().add(slotDto);
-        }
-        return dto;
-    }
-
-    private Person getOwner(HttpServletRequest request){
-        Person person = accountService.getPerson(request);
-        if(person.getAuthority() == Authority.STAFF){
-            person = staffOfOwnerService.getOwner(person);
-        }
-        return person;
-    }
-
 }

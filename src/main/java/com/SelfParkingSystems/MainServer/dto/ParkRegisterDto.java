@@ -1,5 +1,7 @@
 package com.SelfParkingSystems.MainServer.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -19,6 +21,7 @@ public class ParkRegisterDto {
     private String district;
     @Size(min=20, max=300, message="Adres en az 3 en fazla 300 karakter olmalıdır!")
     private String address;
-    @Size(min = 30, max = 120, message = "Rezervasyon süresi en az 30, en fazla 120 dakikadır!")
+    @Min(value = 30, message = "Rezervasyon süresi en az 30 dakika olmalıdır!")
+    @Max(value = 120, message = "Rezervasyon süresi en fazla 120 dakika olmalıdır!")
     private int reservationDuration;
 }
