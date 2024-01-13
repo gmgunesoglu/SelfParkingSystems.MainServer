@@ -15,5 +15,8 @@ public interface ParkingService {
 
     PaymentInfoDto showPaymentInfo(String vehiclePlate);
 
+    PaymentTokenDto getPaymentToken(CardDto cardDto, String vehiclePlate);
+
     String parkingOut(ParkingOutDto parkingOutDto);
+
 }

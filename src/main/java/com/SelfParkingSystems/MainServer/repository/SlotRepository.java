@@ -1,8 +1,6 @@
 package com.SelfParkingSystems.MainServer.repository;
 
-import com.SelfParkingSystems.MainServer.dto.ReservationerDto;
-import com.SelfParkingSystems.MainServer.dto.SlotDetailDto;
-import com.SelfParkingSystems.MainServer.dto.SlotDto;
+import com.SelfParkingSystems.MainServer.dto.*;
 import com.SelfParkingSystems.MainServer.entity.Slot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -66,4 +64,16 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
             "JOIN Person per ON p.ownerId = per.id " +
             "WHERE per.id = :ownerId AND s.paymentRecipe.id = :paymentRecipeId AND s.enable = true")
     List<SlotDto> getSlotDtoListByOwnerIdAndPaymentRecipeId(Long ownerId, Long paymentRecipeId);
+
+    @Query("SELECT new com.SelfParkingSystems.MainServer.dto.SlotListDto" +
+            "(s.id, s.name, s.state) " +
+            "FROM Slot s " +
+            "JOIN Park p ON s.parkId = p.id " +
+            "WHERE s.enable = true AND p.id = :parkId")
+    List<SlotListDto> getSlotListDtoListByParkId(Long parkId);
+
+    @Query("SELECT new com.SelfParkingSystems.MainServer.dto.SlotListDetailDto" +
+            "(s.id, s.name, s.state, s.paymentRecipe.hours2, s.paymentRecipe.hours4, s.paymentRecipe.hours6, s.paymentRecipe.hours10, s.paymentRecipe.hours24) " +
+            "FROM Slot s WHERE s.enable = true AND s.id = :slotId")
+    SlotListDetailDto getSlotListDetailDtoById(Long slotId);
 }

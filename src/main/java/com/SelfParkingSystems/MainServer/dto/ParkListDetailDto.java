@@ -13,4 +13,16 @@ public class ParkListDetailDto {
     private String district;
     private String address;
     private List<SlotListDto> slots;
+
+    public ParkListDetailDto() {
+    }
+
+    public ParkListDetailDto(Long id, String name, String city, String town, String district, String address) {
+        this.id = id;
+        this.name = name;
+        this.city = city;
+        this.town = town;
+        this.district = district;
+        this.address = address;
+    }
 }

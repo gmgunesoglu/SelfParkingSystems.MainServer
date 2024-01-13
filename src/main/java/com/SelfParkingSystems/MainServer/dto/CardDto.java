@@ -3,7 +3,7 @@ package com.SelfParkingSystems.MainServer.dto;
 import lombok.Data;
 
 @Data
-public class CardDTO {
+public class CardDto {
 
     private String cardNumber;
     private String expMonth;

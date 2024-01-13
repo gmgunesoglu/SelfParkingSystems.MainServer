@@ -39,6 +39,11 @@ public class ParkingController {
         return parkingService.showPaymentInfo(vehiclePlate);
     }
 
+    @PostMapping("/payment/{vehiclePlate}")
+    public PaymentTokenDto getPaymentToken(@RequestBody CardDto cardDto, @PathVariable String vehiclePlate){
+        return parkingService.getPaymentToken(cardDto, vehiclePlate);
+    }
+
     @PostMapping("/out")
     public String parkingOut(@RequestBody ParkingOutDto parkingOutDto){
         return parkingService.parkingOut(parkingOutDto);
