@@ -27,6 +27,7 @@ public class AccountServiceImpl implements AccountService{
     private final PasswordEncoder passwordEncoder;
     private final SessionControl sessionControl;
     private final StripeAccountRepository stripeAccountRepository;
+    private final StaffOfOwnerService staffOfOwnerService;
 
 
     @Override
@@ -246,6 +247,16 @@ public class AccountServiceImpl implements AccountService{
     public Person getPerson(HttpServletRequest request){
         String userName = jwtService.getUsername(request);
         return personRepository.findByUserName(userName);
+    }
+
+    @Override
+    public Person getOwner(HttpServletRequest request){
+        String userName = jwtService.getUsername(request);
+        Person owner = personRepository.findByUserName(userName);
+        if(owner.getAuthority() == Authority.STAFF){
+            owner = staffOfOwnerService.getOwner(owner);
+        }
+        return owner;
     }
 
     private AccountDto personToAccountDto(Person person){

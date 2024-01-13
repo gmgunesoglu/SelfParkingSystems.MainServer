@@ -30,4 +30,6 @@ public interface AccountService {
     String remove(LoginDto loginDto, HttpServletRequest request);
 
     Person getPerson(HttpServletRequest request);
+
+    Person getOwner(HttpServletRequest request);
 }
