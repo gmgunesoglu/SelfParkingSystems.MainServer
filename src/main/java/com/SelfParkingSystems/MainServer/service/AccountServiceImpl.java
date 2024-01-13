@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +77,13 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
+    public List<StaffInfoDto> getStaffs(HttpServletRequest request) {
+        // sadece owner lar erişebilecek
+        Person owner = getPerson(request);
+        return personRepository.getStaffInfoDtoListByOwnerId(owner.getId());
+    }
+
+    @Override
     public String changePassword(ChangePasswordDto changePasswordDto, HttpServletRequest request) {
         if(!changePasswordDto.getRePassword().equals(changePasswordDto.getPassword())){
             throw new GlobalRuntimeException("Şire tekrarı hatalı!",HttpStatus.BAD_REQUEST);
@@ -87,7 +95,7 @@ public class AccountServiceImpl implements AccountService{
         person.setPassword(passwordEncoder.encode(changePasswordDto.getPassword()));
         personRepository.save(person);
         sessionControl.removeSession(request);
-        return "Şifreniz değiştirildi, tekrar giriş yapın.";
+        return "Şifreniz değiştirildi, tekrar giriş yapınız.";
     }
 
     @Override
@@ -127,20 +135,31 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public String registerOwner(RiseUserDto riseUserDto, HttpServletRequest request) {
-        Person owner = getPerson(request);
-        if (owner.getStripeAccount() == null){
+        // bu istek sadece admin yetkisinde çalışacak, istek sihibini kontrole gerek yok
+        Person user = personRepository.findByUserName(riseUserDto.getUserName());
+        if(user == null || !user.isEnable()){
+            throw new GlobalRuntimeException("Kullanıcı bulunamadı: " + riseUserDto.getUserName(), HttpStatus.BAD_REQUEST);
+        }
+        if (user.getStripeAccount() == null){
             throw new GlobalRuntimeException("Kullanıcı bir stripe hesabı oluşturmalı!", HttpStatus.BAD_REQUEST);
         }
-        owner.setAuthority(Authority.OWNER);
-        personRepository.save(owner);
+        if(user.getAuthority() != Authority.USER){
+            throw new GlobalRuntimeException("Kullanıcının yetkisi: " + user.getAuthority().toString(), HttpStatus.BAD_REQUEST);
+        }
+        user.setAuthority(Authority.OWNER);
+        personRepository.save(user);
         return riseUserDto.getUserName() + " owner yetkisine yükseltildi.";
     }
 
     @Override
     public String registerStaff(RiseUserDto riseUserDto, HttpServletRequest request) {
+        // bu istek sadece owner yetkisinde çalışacak, istek sihibini kontrole gerek yok
         Person staff = personRepository.findByUserName(riseUserDto.getUserName());
-        if(staff == null){
-            throw new GlobalRuntimeException("Kullanıcı bulunamadı!", HttpStatus.BAD_REQUEST);
+        if(staff == null || !staff.isEnable()){
+            throw new GlobalRuntimeException("Kullanıcı bulunamadı: " + riseUserDto.getUserName(), HttpStatus.BAD_REQUEST);
+        }
+        if(staff.getAuthority() != Authority.USER){
+            throw new GlobalRuntimeException("Kullanıcının yetkisi: " + staff.getAuthority().toString(), HttpStatus.BAD_REQUEST);
         }
         Person owner = getPerson(request);
         StaffOfOwner staffOfOwner = new StaffOfOwner();
@@ -154,9 +173,10 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public String removeStaff(RiseUserDto riseUserDto, HttpServletRequest request) {
+        // bu istek sadece owner yetkisinde çalışacak, istek sihibini kontrole gerek yok
         Person staff = personRepository.findByUserName(riseUserDto.getUserName());
         if(staff == null){
-            throw new GlobalRuntimeException("Personel bulunamadı!", HttpStatus.BAD_REQUEST);
+            throw new GlobalRuntimeException("Size ait bir personel bulunamadı!", HttpStatus.BAD_REQUEST);
         }
         Person owner = getPerson(request);
         StaffOfOwner staffOfOwner = staffOfOwnerRepository.findByStaffIdAndOwnerId(staff.getId(), owner.getId());

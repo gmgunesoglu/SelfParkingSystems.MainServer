@@ -4,6 +4,8 @@ import com.SelfParkingSystems.MainServer.dto.*;
 import com.SelfParkingSystems.MainServer.entity.Person;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 public interface AccountService {
     AccountDto get(HttpServletRequest request);
 
@@ -12,6 +14,8 @@ public interface AccountService {
     JwtDto login(LoginDto loginDto);
 
     String logout(HttpServletRequest request);
+
+    List<StaffInfoDto> getStaffs(HttpServletRequest request);
 
     String changePassword(ChangePasswordDto changePasswordDto, HttpServletRequest request);
 

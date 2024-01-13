@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/account")
 @RequiredArgsConstructor
@@ -35,12 +37,17 @@ public class AccountController {
         return accountService.logout(request);
     }
 
+    @GetMapping("/staffs")
+    public List<StaffInfoDto> getStaffs(HttpServletRequest request){
+        return accountService.getStaffs(request);
+    }
+
     @PutMapping("/change-password")
     public String changePassword(@RequestBody @Valid ChangePasswordDto changePasswordDto, HttpServletRequest request) {
         return accountService.changePassword(changePasswordDto, request);
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public AccountDto update(@RequestBody AccountUpdateDto accountUpdateDto, HttpServletRequest request){
         return accountService.update(accountUpdateDto, request);
     }
